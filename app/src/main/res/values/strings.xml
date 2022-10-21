@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">firedetect2</string>
+    <string name="_2022_10_08">2022-10-08</string>
+    <string name="n_40">습도\n 40%</string>
+    <string name="n_20_c">온도\n 20\'c</string>
+    <string name="n_10ug_m3">미세먼지\n 10ug/m3</string>
+    <string name="situation">날씨 상태 표시줄</string>
+    <string name="string_sun">sun</string>
+    <string name="string_cloudy">cloudy</string>
+    <string name="string_rain">rain</string>
+    <string name="windowsituation">현재 창문은 열려 있습니다.</string>
+    <string name="window">window</string>
+    <string name="auto">AUTO</string>
+    <string name="set">설정</string>
+    <string name="cctv">CCTV</string>
+    <string name="cctv_video">CCTV 화면</string>
+    <string name="left">left</string>
+    <string name="up">up</string>
+    <string name="down">down</string>
+    <string name="right">right</string>
+</resources>
