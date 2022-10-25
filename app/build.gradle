@@ -2,11 +2,14 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'com.google.gms.google-services'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
+
 
     defaultConfig {
         configurations.all {
@@ -14,7 +17,7 @@ android {
         }
         applicationId "com.example.firedetect2"
         minSdkVersion 24
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -34,20 +37,25 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    dataBinding{
+        enabled = true
+    }
 }
 
 dependencies {
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     //파이어베이스 사용
     implementation platform('com.google.firebase:firebase-bom:30.5.0')
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.4.0'
+    implementation 'com.google.android.datatransport:transport-runtime:3.1.8'
+    implementation 'androidx.databinding:databinding-runtime:7.3.1'
 
 
     testImplementation 'junit:junit:4.+'
@@ -58,4 +66,15 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     // Converter ( JSON 타입 결과를 객체로 매핑 )
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    // Dagger Hilt
+    implementation"com.google.dagger:hilt-android:2.44"
+    kapt"com.google.dagger:hilt-android-compiler:2.44"
+
+    implementation "androidx.activity:activity-ktx:1.6.0"
+
+    def lifecycle_version = "2.4.0"
+    //noinspection GradleDependency
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
 }
