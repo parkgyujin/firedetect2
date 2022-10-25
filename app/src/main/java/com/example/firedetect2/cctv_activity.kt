@@ -8,5 +8,7 @@ class cctv_activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.cctv_activity)
+
+        //웹뷰 만들기
     }
 }
