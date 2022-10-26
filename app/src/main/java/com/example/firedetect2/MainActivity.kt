@@ -40,6 +40,10 @@ class MainActivity : AppCompatActivity() {
         val today: TextView = findViewById(R.id.today)
         val clickBtn: Button = findViewById(R.id.clickBtn)
 
+        val clickBtn2: Button = findViewById(R.id.clickBtn2)
+
+
+
         //현재 날짜를 가져오는 메소드
         val now = LocalDate.now()
         val strnow = now.format(DateTimeFormatter.ofPattern("yyyy년MM월dd일"))
@@ -51,13 +55,15 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        //날씨를 받는 버튼
+        clickBtn2.setOnClickListener {
+                CurrentCall()
+            }
+
         //오늘 날짜
         today.text = strnow
 
-        //날씨데이터의 Null값
-        if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(applicationContext)
-        }
+
 
         //쓰기
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -91,55 +97,63 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        //날씨데이터의 Null값
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(applicationContext)
+        }
+    }
+
+
+    fun CurrentCall(){
 
         val cityView: TextView = findViewById(R.id.cityView)
         val weatherView: TextView = findViewById(R.id.weatherView)
         val tempView: TextView = findViewById(R.id.tempView)
 
-        val url =
-            "api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=bdc9150fa915f2970dda565e1e75047e}"
+        val url = "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=bdc9150fa915f2970dda565e1e75047e"
 
-        val request: StringRequest = object : StringRequest(Method.GET, url, Response.Listener
-        {
-                response ->
-                    try {
+        val request: StringRequest = @SuppressLint("SetTextI18n")
+        object : StringRequest(Method.GET, url, Response.Listener
+        { response ->
+            try {
 
-                        //api로 받은 파일 jsonobject로 새로운 객체 선언
-                        val jsonObject = JSONObject(response)
-
-
-                        //도시 키값 받기
-                        val city = jsonObject.getString("name")
-                        cityView.text = city
+                //api로 받은 파일 jsonobject로 새로운 객체 선언
+                val jsonObject = JSONObject(response)
 
 
-                        //날씨 키값 받기
-                        val weatherJson = jsonObject.getJSONArray("weather")
-                        val weatherObj = weatherJson.getJSONObject(0)
-                        val weather = weatherObj.getString("description")
-                        weatherView.text = weather
+                //도시 키값 받기
+                val city = jsonObject.getString("name")
+                cityView.text = "지역 \n $city"
 
 
-                        //기온 키값 받기
-                        val tempK = JSONObject(jsonObject.getString("main"))
+                //날씨 키값 받기
+                val weatherJson = jsonObject.getJSONArray("weather")
+                val weatherObj = weatherJson.getJSONObject(0)
+                val weather = weatherObj.getString("description")
+                weatherView.text = "현재 날씨 \n $weather"
 
-                        //기온 받고 켈빈 온도를 섭씨 온도로 변경
-                        val tempDo = ((tempK.getDouble("temp") - 273.15) * 100).roundToInt() / 100.0
-                        tempView.text = "$tempDo°C"
 
-                    }
-                    catch (e: JSONException) {
-                        e.printStackTrace()
-                    } }, Response.ErrorListener { }) {
-                @Throws(AuthFailureError::class)
-                override fun getParams(): Map<String, String> {
-                    return HashMap()
-                }
+                //기온 키값 받기
+                val tempK = JSONObject(jsonObject.getString("main"))
+
+                //기온 받고 켈빈 온도를 섭씨 온도로 변경
+                val tempDo = ((tempK.getDouble("temp") - 273.15) * 100).roundToInt() / 100.0
+                tempView.text = "체감온도 \n $tempDo°C"
+
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
+        }, Response.ErrorListener { }) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String> {
+                return HashMap()
+            }
+        }
 
         request.setShouldCache(false)
         requestQueue!!.add(request)
     }
+
 }
 
 

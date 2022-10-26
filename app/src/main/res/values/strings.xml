@@ -18,4 +18,5 @@
     <string name="up">up</string>
     <string name="down">down</string>
     <string name="right">right</string>
+    <string name="button">Button</string>
 </resources>
