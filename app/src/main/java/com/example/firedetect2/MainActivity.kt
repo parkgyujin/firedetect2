@@ -4,31 +4,27 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import com.example.firedetect2.Constants.Companion.TAG
-import com.example.firedetect2.databinding.ActivityMainBinding
+import com.android.volley.*
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import dagger.hilt.android.AndroidEntryPoint
+import org.json.JSONException
+import org.json.JSONObject
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.roundToInt
 
-//@AndroidEntryPoint
+
 class MainActivity : AppCompatActivity() {
-
-
-    // 뷰모델 생성
-//    private val viewModel by viewModels<WeatherViewModel>()
-//    private lateinit var binding : ActivityMainBinding
+    var requestQueue: RequestQueue? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
 
@@ -56,7 +52,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         //오늘 날짜
-        today.text= strnow
+        today.text = strnow
+
+        //날씨데이터의 Null값
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(applicationContext)
+        }
 
         //쓰기
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -75,12 +76,13 @@ class MainActivity : AppCompatActivity() {
                 val gas = dataSnapshot.child("gas").getValue(String::class.java)
 //                val rain = dataSnapshot.child("rain").getValue(String::class.java)
 
-                temper.text="온도 \n $temp°C"
-                humidity.text="습도 \n $humi%"
-                dust.text="미세먼지 \n $gas"
+                temper.text = "온도 \n $temp°C"
+                humidity.text = "습도 \n $humi%"
+                dust.text = "미세먼지 \n $gas"
 
 
             }
+
             //센서 오류시 작동하는 error 코드
             @SuppressLint("SetTextI18n")
             override fun onCancelled(error: DatabaseError) {
@@ -89,19 +91,57 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-            //기상청 데이터바인딩
-//            binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
-//            binding.lifecycleOwner = this
-//
-//            viewModel.getWeather("JSON",14,1,
-//                20220322,1100,"63","89")
-//
-//            viewModel.weatherResponse.observe(this){
-//                for(i in it.body()?.response!!.body.items.item){
-//                    Log.d(TAG, "$i")
-//                }
-//            }
-        }
+
+        val cityView: TextView = findViewById(R.id.cityView)
+        val weatherView: TextView = findViewById(R.id.weatherView)
+        val tempView: TextView = findViewById(R.id.tempView)
+
+        val url =
+            "api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=bdc9150fa915f2970dda565e1e75047e}"
+
+        val request: StringRequest = object : StringRequest(Method.GET, url, Response.Listener
+        {
+                response ->
+                    try {
+
+                        //api로 받은 파일 jsonobject로 새로운 객체 선언
+                        val jsonObject = JSONObject(response)
+
+
+                        //도시 키값 받기
+                        val city = jsonObject.getString("name")
+                        cityView.text = city
+
+
+                        //날씨 키값 받기
+                        val weatherJson = jsonObject.getJSONArray("weather")
+                        val weatherObj = weatherJson.getJSONObject(0)
+                        val weather = weatherObj.getString("description")
+                        weatherView.text = weather
+
+
+                        //기온 키값 받기
+                        val tempK = JSONObject(jsonObject.getString("main"))
+
+                        //기온 받고 켈빈 온도를 섭씨 온도로 변경
+                        val tempDo = ((tempK.getDouble("temp") - 273.15) * 100).roundToInt() / 100.0
+                        tempView.text = "$tempDo°C"
+
+                    }
+                    catch (e: JSONException) {
+                        e.printStackTrace()
+                    } }, Response.ErrorListener { }) {
+                @Throws(AuthFailureError::class)
+                override fun getParams(): Map<String, String> {
+                    return HashMap()
+                }
+            }
+
+        request.setShouldCache(false)
+        requestQueue!!.add(request)
+    }
 }
+
+
 
 

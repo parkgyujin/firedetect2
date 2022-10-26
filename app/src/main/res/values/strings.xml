@@ -4,7 +4,7 @@
     <string name="n_40">습도\n 40%</string>
     <string name="n_20_c">온도\n 20\'c</string>
     <string name="n_10ug_m3">미세먼지\n 10ug/m3</string>
-    <string name="situation">날씨 상태 표시줄</string>
+    <string name="situation">날씨 상태</string>
     <string name="string_sun">sun</string>
     <string name="string_cloudy">cloudy</string>
     <string name="string_rain">rain</string>
