@@ -17,8 +17,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import org.json.JSONException
 import org.json.JSONObject
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -26,8 +24,8 @@ import kotlin.math.roundToInt
 class MainActivity : AppCompatActivity() {
     var requestQueue: RequestQueue? = null
 
+    @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.O)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,16 +35,17 @@ class MainActivity : AppCompatActivity() {
         val temper: TextView = findViewById(R.id.temper)
         val humidity: TextView = findViewById(R.id.humidity)
         val dust: TextView = findViewById(R.id.dust)
-        val today: TextView = findViewById(R.id.today)
+        val gasView: TextView = findViewById(R.id.gasView)
+        val rainView: TextView = findViewById(R.id.rainView)
+
+
+
         val clickBtn: Button = findViewById(R.id.clickBtn)
 
         val clickBtn2: Button = findViewById(R.id.clickBtn2)
 
 
 
-        //현재 날짜를 가져오는 메소드
-        val now = LocalDate.now()
-        val strnow = now.format(DateTimeFormatter.ofPattern("yyyy년MM월dd일"))
 
         //activty 전환을 위한 클릭버튼
         clickBtn.setOnClickListener {
@@ -60,10 +59,6 @@ class MainActivity : AppCompatActivity() {
                 CurrentCall()
             }
 
-        //오늘 날짜
-        today.text = strnow
-
-
 
         //쓰기
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -72,19 +67,20 @@ class MainActivity : AppCompatActivity() {
 
         //센서 데이터를 실시간으로 읽어들임
         myRef.addValueEventListener(object : ValueEventListener {
-
             @SuppressLint("SetTextI18n")
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 //데이터베이스로 부터 실시간으로 가져오고 쓰는 정보값의 변수
-//                val heat = dataSnapshot.child("heat").getValue(String::class.java)
+                val heat = dataSnapshot.child("heat").getValue(String::class.java)
                 val temp = dataSnapshot.child("temp").getValue(String::class.java)
                 val humi = dataSnapshot.child("humi").getValue(String::class.java)
                 val gas = dataSnapshot.child("gas").getValue(String::class.java)
-//                val rain = dataSnapshot.child("rain").getValue(String::class.java)
+                val rain = dataSnapshot.child("rain").getValue(String::class.java)
 
                 temper.text = "온도 \n $temp°C"
                 humidity.text = "습도 \n $humi%"
-                dust.text = "미세먼지 \n $gas"
+                dust.text = "미세먼지 \n $heat"
+                gasView.text = "가스 감지 \n $gas"
+                rainView.text = "빗물 감지 상태 \n $rain"
 
 
             }
@@ -110,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         val weatherView: TextView = findViewById(R.id.weatherView)
         val tempView: TextView = findViewById(R.id.tempView)
 
-        val url = "https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=bdc9150fa915f2970dda565e1e75047e"
+        val url = "https://api.openweathermap.org/data/2.5/weather?q=Seoul, KR,uk&APPID=bdc9150fa915f2970dda565e1e75047e"
 
         val request: StringRequest = @SuppressLint("SetTextI18n")
         object : StringRequest(Method.GET, url, Response.Listener
@@ -153,7 +149,6 @@ class MainActivity : AppCompatActivity() {
         request.setShouldCache(false)
         requestQueue!!.add(request)
     }
-
 }
 
 
